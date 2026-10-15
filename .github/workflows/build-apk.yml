@@ -1,0 +1,53 @@
+
+name: Build Better Lyrics Extension
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - echo-better-lyrics.zip
+      - .github/workflows/build-apk.yml
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: '17'
+
+      - name: Extract project
+        run: unzip -q echo-better-lyrics.zip -d project
+
+      - name: Build and test extension
+        env:
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.repository }}
+        run: bash project/echo-better-lyrics/ci/build.sh
+
+      - name: Upload APK and EAPK
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: better-lyrics-extension
+          path: out/
+          if-no-files-found: warn
+
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: logs/
+          if-no-files-found: ignore
+          
