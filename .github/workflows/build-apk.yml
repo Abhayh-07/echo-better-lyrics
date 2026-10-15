@@ -29,6 +29,11 @@ jobs:
       - name: Extract project
         run: unzip -q echo-better-lyrics.zip -d project
 
+      - name: Update Kotlin dependency versions
+        run: |
+          sed -i 's/kotlinx-serialization-json:1.7.3/kotlinx-serialization-json:1.9.0/' project/echo-better-lyrics/ci/build.sh
+          sed -i 's/kotlinx-coroutines-core:1.9.0/kotlinx-coroutines-core:1.10.2/' project/echo-better-lyrics/ci/build.sh
+
       - name: Build and test extension
         env:
           OWNER: ${{ github.repository_owner }}
@@ -50,4 +55,4 @@ jobs:
           name: build-logs
           path: logs/
           if-no-files-found: ignore
-          
+
